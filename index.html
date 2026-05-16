@@ -727,7 +727,7 @@
       }
     }
   </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div class="bubble-transition" id="bubble-transition">
@@ -1018,7 +1018,7 @@
   <script>
     const SUPABASE_URL = 'https://appwicoxfoegjcikxbpe.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwcHdpY294Zm9lZ2pjaWt4YnBlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MTYzODQsImV4cCI6MjA5NDQ5MjM4NH0.pvf9dnFji-VZV4tCZyIVaAy_oO2IqqQCL8kGFZG08Lg';
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     function createBubbleTransition() {
       const container = document.getElementById('bubble-transition');
@@ -1106,10 +1106,10 @@
       const usluga = document.getElementById('usluga').value;
       const poruka = document.getElementById('poruka').value.trim();
 
-      const submitButton = e.target.querySelector('button[type="submit"]');
-      const oldText = submitButton.textContent;
-      submitButton.disabled = true;
-      submitButton.textContent = 'Slanje...';
+      const dugme = e.target.querySelector('button[type="submit"]');
+      const stariTekst = dugme.textContent;
+      dugme.disabled = true;
+      dugme.textContent = 'Slanje...';
 
       const { error } = await supabaseClient
         .from('inquiries')
@@ -1122,12 +1122,12 @@
           status: 'Novo'
         }]);
 
-      submitButton.disabled = false;
-      submitButton.textContent = oldText;
+      dugme.disabled = false;
+      dugme.textContent = stariTekst;
 
       if (error) {
         console.error('Supabase greška:', error);
-        alert('Došlo je do greške. Proverite internet ili Supabase podešavanja.');
+        alert('Greška pri slanju upita: ' + (error.message || 'Proveri Supabase podešavanja.'));
         return;
       }
 

@@ -727,7 +727,7 @@
       }
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div class="bubble-transition" id="bubble-transition">
@@ -831,138 +831,19 @@
           <button class="back-btn" onclick="showPricing('choice')">← Nazad na izbor</button>
           <div class="section-title">
             <h2>Auto Detailing cenovnik</h2>
-            <p>Paketi za automobile — cena zavisi od veličine i stanja vozila</p>
+            <p>Paketi za automobile — cene i stavke se učitavaju uživo iz admin panela</p>
           </div>
-
-          <div class="cards" style="grid-template-columns:repeat(3, 1fr); align-items:stretch;"> 
-            <div class="card" style="border:1px solid rgba(0,212,255,0.35); background:linear-gradient(180deg,#111b26,#0a1118);">
-              <h3 style="font-size:30px; margin-bottom:8px;">BASIC PROGRAM</h3>
-              <div class="price" style="font-size:42px; color:#00d4ff;">160€</div>
-              <ul style="margin-top:22px; line-height:2;">
-                <li>Detaljno pranje vozila</li>
-                <li>Jednoslojno poliranje vozila</li>
-                <li>Detaljno čišćenje staklenih površina</li>
-                <li>Impregnacija guma</li>
-                <li>Keramička zaštita laka</li>
-              </ul>
-            </div>
-
-            <div class="card" style="border:1px solid rgba(0,212,255,0.35); background:linear-gradient(180deg,#111b26,#0a1118);">
-              <h3 style="font-size:30px; margin-bottom:8px;">STANDARD PROGRAM</h3>
-              <div class="price" style="font-size:42px; color:#00d4ff;">200€</div>
-              <ul style="margin-top:22px; line-height:2;">
-                <li>Detaljno pranje vozila</li>
-                <li>Dvoslojno poliranje vozila</li>
-                <li>Detaljno čišćenje staklenih površina</li>
-                <li>Impregnacija guma</li>
-                <li>Keramička zaštita laka i staklenih površina</li>
-              </ul>
-            </div>
-
-            <div class="card" style="border:1px solid rgba(0,212,255,0.5); background:linear-gradient(180deg,#13202d,#091018); box-shadow:0 0 35px rgba(0,212,255,0.15);">
-              <h3 style="font-size:30px; margin-bottom:8px; color:#7eeeff;">PREMIUM PROGRAM</h3>
-              <div class="price" style="font-size:42px; color:#00d4ff;">290€</div>
-              <ul style="margin-top:22px; line-height:2;">
-                <li>Detaljno pranje vozila</li>
-                <li>Višeslojno poliranje vozila</li>
-                <li>Detaljno čišćenje staklenih površina</li>
-                <li>Impregnacija guma</li>
-                <li>Keramička zaštita za sve površine</li>
-                <li>Zatačkavanje</li>
-              </ul>
-            </div>
-          </div>
-
-          <div style="margin-top:60px;">
-            <div class="section-title" style="margin-bottom:30px;">
-              <h2 style="font-size:34px;">Dodatne usluge</h2>
-              <p>Dodatni premium tretmani za vozila</p>
-            </div>
-
-            <div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr));">
-              <div class="card">
-                <h3>Dubinsko pranje Hatchback</h3>
-                <div class="price">80€</div>
-              </div>
-
-              <div class="card">
-                <h3>Dubinsko pranje Coupe / Limuzine</h3>
-                <div class="price">100€</div>
-              </div>
-
-              <div class="card">
-                <h3>Dubinsko pranje Karavan</h3>
-                <div class="price">120€</div>
-              </div>
-
-              <div class="card">
-                <h3>Dubinsko pranje Dzip / Mini Van</h3>
-                <div class="price">140€</div>
-              </div>
-
-              <div class="card">
-                <h3>Pranje podvozja vozila</h3>
-                <div class="price">35€</div>
-              </div>
-
-              <div class="card">
-                <h3>Lakirane kočnice</h3>
-                <div class="price">60€</div>
-              </div>
-            </div>
-          </div>
+          <div id="autoServices" class="cards" style="grid-template-columns:repeat(3, 1fr); align-items:stretch;"></div>
+          <div id="additionalServices" style="margin-top:60px;"></div>
         </div>
 
         <div id="pricing-moto" class="pricing-view">
           <button class="back-btn" onclick="showPricing('choice')">← Nazad na izbor</button>
           <div class="section-title">
             <h2>Moto Detailing cenovnik</h2>
-            <p>Premium tretmani za motocikle i skutere</p>
+            <p>Paketi za motocikle — cene i stavke se učitavaju uživo iz admin panela</p>
           </div>
-
-          <div class="cards" style="grid-template-columns:repeat(3, 1fr); align-items:stretch;">
-            <div class="card" style="border:1px solid rgba(0,212,255,0.35); background:linear-gradient(180deg,#111b26,#0a1118);">
-              <h3 style="font-size:30px; margin-bottom:8px;">BASIC MOTO</h3>
-              <div class="price" style="font-size:42px; color:#00d4ff;">60€</div>
-              <ul style="margin-top:22px; line-height:2;">
-                <li>Detaljno pranje motocikla</li>
-                <li>Čišćenje felni i kočnica</li>
-                <li>Odmašćivanje delova</li>
-                <li>Čišćenje sedišta i plastika</li>
-                <li>Dressing plastika i guma</li>
-                <li>Zaštita spoljašnjih površina</li>
-              </ul>
-            </div>
-
-            <div class="card" style="border:1px solid rgba(0,212,255,0.35); background:linear-gradient(180deg,#111b26,#0a1118);">
-              <h3 style="font-size:30px; margin-bottom:8px;">STANDARD MOTO</h3>
-              <div class="price" style="font-size:42px; color:#00d4ff;">100€</div>
-              <ul style="margin-top:22px; line-height:2;">
-                <li>Sve iz BASIC paketa</li>
-                <li>Jednoslojno poliranje rezervoara i plastika</li>
-                <li>Uklanjanje sitnih mikroogrebotina</li>
-                <li>Zaštita laka i plastika</li>
-                <li>Detaljno čišćenje auspuha i metalnih delova</li>
-                <li>Zaštita vizira i stakala</li>
-              </ul>
-            </div>
-
-            <div class="card" style="border:1px solid rgba(0,212,255,0.5); background:linear-gradient(180deg,#13202d,#091018); box-shadow:0 0 35px rgba(0,212,255,0.15);">
-              <h3 style="font-size:30px; margin-bottom:8px; color:#7eeeff;">PREMIUM MOTO</h3>
-              <div class="price" style="font-size:42px; color:#00d4ff;">150€</div>
-              <ul style="margin-top:22px; line-height:2;">
-                <li>Kompletan detailing motocikla</li>
-                <li>Višeslojno korekciono poliranje</li>
-                <li>Keramička zaštita laka</li>
-                <li>Keramička zaštita felni i plastika</li>
-                <li>Poliranje metalnih delova</li>
-                <li>Detaljno čišćenje lanca i pogonskog dela</li>
-                <li>Zaštita sedišta i svih površina</li>
-                <li>Finalni showroom finish</li>
-              </ul>
-            </div>
-          </div>
-        </div>
+          <div id="motoServices" class="cards" style="grid-template-columns:repeat(3, 1fr); align-items:stretch;"></div>
         </div>
       </div>
     </section>
@@ -973,12 +854,7 @@
           <h2>Galerija radova</h2>
           <p>Primeri izgleda i atmosfere našeg rada</p>
         </div>
-        <div class="gallery">
-          <img src="https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&w=900&q=80" alt="Auto detailing" />
-          <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=900&q=80" alt="Poliran auto" />
-          <img src="https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=900&q=80" alt="Sportski auto" />
-          <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=80" alt="Sjajan auto" />
-        </div>
+        <div class="gallery" id="galleryGrid"></div>
       </div>
     </section>
 
@@ -1018,7 +894,7 @@
   <script>
     const SUPABASE_URL = 'https://appwicoxfoegjcikxbpe.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwcHdpY294Zm9lZ2pjaWt4YnBlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MTYzODQsImV4cCI6MjA5NDQ5MjM4NH0.pvf9dnFji-VZV4tCZyIVaAy_oO2IqqQCL8kGFZG08Lg';
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     function createBubbleTransition() {
       const container = document.getElementById('bubble-transition');
@@ -1097,6 +973,82 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+
+    const defaultServices = [
+      {category:'auto',name:'BASIC PROGRAM',price:'160€',items:['Detaljno pranje vozila','Jednoslojno poliranje vozila','Detaljno čišćenje staklenih površina','Impregnacija guma','Keramička zaštita laka']},
+      {category:'auto',name:'STANDARD PROGRAM',price:'200€',items:['Detaljno pranje vozila','Dvoslojno poliranje vozila','Detaljno čišćenje staklenih površina','Impregnacija guma','Keramička zaštita laka i staklenih površina']},
+      {category:'auto',name:'PREMIUM PROGRAM',price:'290€',items:['Detaljno pranje vozila','Višeslojno poliranje vozila','Detaljno čišćenje staklenih površina','Impregnacija guma','Keramička zaštita za sve površine','Zatačkavanje']},
+      {category:'additional',name:'Dubinsko pranje Hatchback',price:'80€',items:[]},
+      {category:'additional',name:'Dubinsko pranje Coupe / Limuzine',price:'100€',items:[]},
+      {category:'additional',name:'Dubinsko pranje Karavan',price:'120€',items:[]},
+      {category:'additional',name:'Dubinsko pranje Dzip / Mini Van',price:'140€',items:[]},
+      {category:'additional',name:'Pranje podvozja vozila',price:'35€',items:[]},
+      {category:'additional',name:'Lakirane kočnice',price:'60€',items:[]},
+      {category:'moto',name:'BASIC MOTO',price:'60€',items:['Detaljno pranje motocikla','Čišćenje felni i kočnica','Odmašćivanje delova','Čišćenje sedišta i plastika','Dressing plastika i guma','Zaštita spoljašnjih površina']},
+      {category:'moto',name:'STANDARD MOTO',price:'100€',items:['Sve iz BASIC paketa','Jednoslojno poliranje rezervoara i plastika','Uklanjanje sitnih mikroogrebotina','Zaštita laka i plastika','Detaljno čišćenje auspuha i metalnih delova','Zaštita vizira i stakala']},
+      {category:'moto',name:'PREMIUM MOTO',price:'150€',items:['Kompletan detailing motocikla','Višeslojno korekciono poliranje','Keramička zaštita laka','Keramička zaštita felni i plastika','Poliranje metalnih delova','Detaljno čišćenje lanca i pogonskog dela','Zaštita sedišta i svih površina','Finalni showroom finish']}
+    ];
+
+    const defaultGallery = [
+      {image_url:'https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&w=900&q=80', title:'Auto detailing'},
+      {image_url:'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=900&q=80', title:'Poliran auto'},
+      {image_url:'https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=900&q=80', title:'Sportski auto'},
+      {image_url:'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=80', title:'Sjajan auto'}
+    ];
+
+    function serviceCard(service, premium=false) {
+      const items = Array.isArray(service.items) ? service.items : [];
+      return `
+        <div class="card" style="border:1px solid ${premium ? 'rgba(0,212,255,0.5)' : 'rgba(0,212,255,0.35)'}; background:linear-gradient(180deg,#111b26,#0a1118); ${premium ? 'box-shadow:0 0 35px rgba(0,212,255,0.15);' : ''}">
+          <h3 style="font-size:30px; margin-bottom:8px; ${premium ? 'color:#7eeeff;' : ''}">${service.name}</h3>
+          <div class="price" style="font-size:42px; color:#00d4ff;">${service.price}</div>
+          ${items.length ? `<ul style="margin-top:22px; line-height:2;">${items.map(i=>`<li>${i}</li>`).join('')}</ul>` : ''}
+        </div>`;
+    }
+
+    async function loadServices() {
+      const { data, error } = await supabaseClient.from('services').select('*').order('sort_order', { ascending:true }).order('id', { ascending:true });
+      const services = (!error && data && data.length) ? data : defaultServices;
+
+      const auto = services.filter(s => s.category === 'auto');
+      const moto = services.filter(s => s.category === 'moto');
+      const additional = services.filter(s => s.category === 'additional');
+
+      document.getElementById('autoServices').innerHTML = auto.map(s => serviceCard(s, String(s.name).toLowerCase().includes('premium'))).join('');
+      document.getElementById('motoServices').innerHTML = moto.map(s => serviceCard(s, String(s.name).toLowerCase().includes('premium'))).join('');
+
+      document.getElementById('additionalServices').innerHTML = additional.length ? `
+        <div class="section-title" style="margin-bottom:30px;">
+          <h2 style="font-size:34px;">Dodatne usluge</h2>
+          <p>Dodatni premium tretmani za vozila</p>
+        </div>
+        <div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr));">
+          ${additional.map(s => serviceCard(s)).join('')}
+        </div>` : '';
+
+      const select = document.getElementById('usluga');
+      if (select) {
+        select.innerHTML = '<option value="">Izaberite uslugu</option>' + services.map(s => `<option>${s.name} - ${s.price}</option>`).join('');
+      }
+    }
+
+    async function loadGallery() {
+      const { data, error } = await supabaseClient.from('gallery').select('*').order('sort_order', { ascending:true }).order('id', { ascending:false });
+      const images = (!error && data && data.length) ? data : defaultGallery;
+      document.getElementById('galleryGrid').innerHTML = images.map(img => `<img src="${img.image_url}" alt="${img.title || 'BG Auto Spa'}" />`).join('');
+    }
+
+    function startLiveSiteUpdates() {
+      supabaseClient.channel('live-services-gallery')
+        .on('postgres_changes', { event:'*', schema:'public', table:'services' }, loadServices)
+        .on('postgres_changes', { event:'*', schema:'public', table:'gallery' }, loadGallery)
+        .subscribe();
+    }
+
+    loadServices();
+    loadGallery();
+    startLiveSiteUpdates();
+
     async function sendRequest(e) {
       e.preventDefault();
 
@@ -1106,32 +1058,22 @@
       const usluga = document.getElementById('usluga').value;
       const poruka = document.getElementById('poruka').value.trim();
 
-      const dugme = e.target.querySelector('button[type="submit"]');
-      const stariTekst = dugme.textContent;
-      dugme.disabled = true;
-      dugme.textContent = 'Slanje...';
-
-      const { error } = await supabaseClient
-        .from('inquiries')
-        .insert([{
-          name: ime,
-          phone: telefon,
-          vehicle: vozilo,
-          service: usluga,
-          message: poruka,
-          status: 'Novo'
-        }]);
-
-      dugme.disabled = false;
-      dugme.textContent = stariTekst;
+      const { error } = await supabaseClient.from('inquiries').insert([{
+        name: ime,
+        phone: telefon,
+        vehicle: vozilo,
+        service: usluga,
+        message: poruka,
+        status: 'Novo'
+      }]);
 
       if (error) {
-        console.error('Supabase greška:', error);
-        alert('Greška pri slanju upita: ' + (error.message || 'Proveri Supabase podešavanja.'));
+        console.error(error);
+        alert('Greška pri slanju upita. Proveri internet ili pokušaj ponovo.');
         return;
       }
 
-      alert('Upit je uspešno poslat! Uskoro ćemo vas kontaktirati.');
+      alert('Upit je uspešno poslat! Javljamo se uskoro.');
       e.target.reset();
     }
   </script>

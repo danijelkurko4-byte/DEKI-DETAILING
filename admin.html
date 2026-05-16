@@ -19,75 +19,87 @@
 <section class="panel" id="panel-podesavanja"><div class="box"><h3>Podešavanja sajta</h3><div class="form-grid"><input value="BG Auto Spa" placeholder="Naziv firme"><input value="Mirijevo, Beograd" placeholder="Lokacija"><input value="https://www.instagram.com/bg.auto.spa/" placeholder="Instagram link"><input value="logo.png" placeholder="Logo fajl"><input placeholder="WhatsApp broj"><input placeholder="Email"><textarea placeholder="Opis firme">Tvoj auto, naš ponos!</textarea></div><br><button class="btn btn-primary" onclick="alert('Podešavanja su demo prikaz. Za pravo čuvanje povezujemo Supabase.')">Sačuvaj podešavanja</button></div></section>
 </main>
 <script>
-const SUPABASE_URL='https://appwicoxfoegjcikxbpe.supabase.co';
-const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwcHdpY294Zm9lZ2pjaWt4YnBlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MTYzODQsImV4cCI6MjA5NDQ5MjM4NH0.pvf9dnFji-VZV4tCZyIVaAy_oO2IqqQCL8kGFZG08Lg';
-const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let inquiries=[];
+const SUPABASE_URL = 'https://appwicoxfoegjcikxbpe.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwcHdpY294Zm9lZ2pjaWt4YnBlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MTYzODQsImV4cCI6MjA5NDQ5MjM4NH0.pvf9dnFji-VZV4tCZyIVaAy_oO2IqqQCL8kGFZG08Lg';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let inquiries = [];
 
-function openPanel(panel,button){
-  document.querySelectorAll('.panel').forEach(i=>i.classList.remove('active'));
-  document.getElementById('panel-'+panel).classList.add('active');
-  document.querySelectorAll('.menu button').forEach(b=>b.classList.remove('active'));
-  if(button)button.classList.add('active');
-  document.getElementById('panelTitle').textContent={dashboard:'Dashboard',upiti:'Upiti klijenata',termini:'Termini',cenovnik:'Cenovnik',podesavanja:'Podešavanja'}[panel]||'Admin Panel';
+function openPanel(panel, button) {
+  document.querySelectorAll('.panel').forEach(i => i.classList.remove('active'));
+  document.getElementById('panel-' + panel).classList.add('active');
+  document.querySelectorAll('.menu button').forEach(b => b.classList.remove('active'));
+  if (button) button.classList.add('active');
+  document.getElementById('panelTitle').textContent = {
+    dashboard: 'Dashboard',
+    upiti: 'Upiti klijenata',
+    termini: 'Termini',
+    cenovnik: 'Cenovnik',
+    podesavanja: 'Podešavanja'
+  }[panel] || 'Admin Panel';
 }
 
-function priceFromService(s){
-  if(!s)return 0;
-  const m=String(s).match(/(\d+)\s*€/);
-  return m?Number(m[1]):0;
+function priceFromService(service) {
+  const m = String(service || '').match(/(\d+)\s*€/);
+  return m ? Number(m[1]) : 0;
 }
 
-async function loadInquiries(){
+function statusClass(status) {
+  return String(status || 'Novo').toLowerCase().replace('š','s').replace('ž','z');
+}
+
+async function loadInquiries() {
   const { data, error } = await supabaseClient
     .from('inquiries')
     .select('*')
-    .order('created_at', { ascending:false });
+    .order('created_at', { ascending: false });
 
-  if(error){
-    console.error('Greška pri učitavanju upita:', error);
-    alert('Greška pri učitavanju iz Supabase baze. Proveri RLS/policies.');
+  if (error) {
+    console.error('Greška pri učitavanju:', error);
+    alert('Greška pri učitavanju iz Supabase baze: ' + (error.message || ''));
     return;
   }
 
-  inquiries=(data||[]).map(i=>({
-    id:i.id,
-    date:i.created_at?new Date(i.created_at).toLocaleDateString('sr-RS'):'-',
-    ime:i.name||'',
-    telefon:i.phone||'',
-    vozilo:i.vehicle||'',
-    usluga:i.service||'',
-    status:i.status||'Novo',
-    cena:priceFromService(i.service||''),
-    napomena:i.message||''
+  inquiries = (data || []).map(i => ({
+    id: i.id,
+    date: i.created_at ? new Date(i.created_at).toLocaleDateString('sr-RS') : '-',
+    ime: i.name || '',
+    telefon: i.phone || '',
+    vozilo: i.vehicle || '',
+    usluga: i.service || '',
+    status: i.status || 'Novo',
+    cena: priceFromService(i.service || ''),
+    napomena: i.message || ''
   }));
 
   renderAll();
 }
 
-async function addInquiry(e){
+async function addInquiry(e) {
   e.preventDefault();
-  const service=usluga.value;
-  const btn=e.target.querySelector('button[type="submit"]');
-  const old=btn.textContent;
-  btn.disabled=true;
-  btn.textContent='Čuvanje...';
+  const service = document.getElementById('usluga').value;
+  const btn = e.target.querySelector('button[type="submit"]');
+  const oldText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Čuvanje...';
+
+  const manualPrice = document.getElementById('cena').value;
+  const serviceWithPrice = manualPrice && !service.includes('€') ? `${service} - ${manualPrice}€` : service;
 
   const { error } = await supabaseClient.from('inquiries').insert([{
-    name:ime.value.trim(),
-    phone:telefon.value.trim(),
-    vehicle:vozilo.value.trim(),
-    service:service,
-    message:napomena.value.trim(),
-    status:status.value || 'Novo'
+    name: document.getElementById('ime').value.trim(),
+    phone: document.getElementById('telefon').value.trim(),
+    vehicle: document.getElementById('vozilo').value.trim(),
+    service: serviceWithPrice,
+    message: document.getElementById('napomena').value.trim(),
+    status: document.getElementById('status').value || 'Novo'
   }]);
 
-  btn.disabled=false;
-  btn.textContent=old;
+  btn.disabled = false;
+  btn.textContent = oldText;
 
-  if(error){
-    console.error('Greška pri dodavanju upita:', error);
-    alert('Greška pri čuvanju upita.');
+  if (error) {
+    console.error('Greška pri čuvanju:', error);
+    alert('Greška pri čuvanju upita: ' + (error.message || ''));
     return;
   }
 
@@ -95,36 +107,123 @@ async function addInquiry(e){
   await loadInquiries();
 }
 
-function statusClass(s){return String(s||'').toLowerCase().replace('š','s').replace('ž','z')}
+async function changeStatus(id, status) {
+  const { error } = await supabaseClient
+    .from('inquiries')
+    .update({ status })
+    .eq('id', id);
 
-async function changeStatus(id,status){
-  const { error } = await supabaseClient.from('inquiries').update({status}).eq('id',id);
-  if(error){console.error(error);alert('Greška pri promeni statusa.');return;}
+  if (error) {
+    console.error('Greška pri promeni statusa:', error);
+    alert('Greška pri promeni statusa: ' + (error.message || ''));
+    return;
+  }
+
   await loadInquiries();
 }
 
-async function deleteInquiry(id){
-  if(!confirm('Da li sigurno brišeš ovaj upit?'))return;
-  const { error } = await supabaseClient.from('inquiries').delete().eq('id',id);
-  if(error){console.error(error);alert('Greška pri brisanju upita.');return;}
+async function deleteInquiry(id) {
+  if (!confirm('Da li sigurno brišeš ovaj upit?')) return;
+
+  const { error } = await supabaseClient
+    .from('inquiries')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Greška pri brisanju:', error);
+    alert('Greška pri brisanju upita: ' + (error.message || ''));
+    return;
+  }
+
   await loadInquiries();
 }
 
-function renderTable(){
-  inquiryTable.innerHTML=inquiries.map(i=>`<tr><td>${i.date}</td><td>${i.ime}</td><td>${i.telefon}</td><td>${i.vozilo}</td><td>${i.usluga}</td><td>${i.cena?i.cena+'€':'-'}</td><td><span class="status ${statusClass(i.status)}">${i.status}</span></td><td><div class="table-actions"><button class="small-btn" onclick="changeStatus(${i.id},'Kontaktiran')">Kontaktiran</button><button class="small-btn" onclick="changeStatus(${i.id},'Zakazano')">Zakazano</button><button class="small-btn" onclick="changeStatus(${i.id},'Završeno')">Završeno</button><button class="small-btn" onclick="deleteInquiry(${i.id})">Obriši</button></div></td></tr>`).join('');
+function renderTable() {
+  document.getElementById('inquiryTable').innerHTML = inquiries.map(i => `
+    <tr>
+      <td>${i.date}</td>
+      <td>${i.ime}</td>
+      <td>${i.telefon}</td>
+      <td>${i.vozilo}</td>
+      <td>${i.usluga}</td>
+      <td>${i.cena ? i.cena + '€' : '-'}</td>
+      <td><span class="status ${statusClass(i.status)}">${i.status}</span></td>
+      <td>
+        <div class="table-actions">
+          <button class="small-btn" onclick="changeStatus(${i.id}, 'Kontaktiran')">Kontaktiran</button>
+          <button class="small-btn" onclick="changeStatus(${i.id}, 'Zakazano')">Zakazano</button>
+          <button class="small-btn" onclick="changeStatus(${i.id}, 'Završeno')">Završeno</button>
+          <button class="small-btn" onclick="deleteInquiry(${i.id})">Obriši</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
 }
-function renderLatest(){latestTable.innerHTML=inquiries.slice(0,5).map(i=>`<tr><td>${i.ime}</td><td>${i.telefon}</td><td>${i.vozilo}</td><td>${i.usluga}</td><td><span class="status ${statusClass(i.status)}">${i.status}</span></td></tr>`).join('')}
-function renderAppointments(){appointmentsTable.innerHTML=inquiries.filter(i=>i.status==='Zakazano').map(i=>`<tr><td>${i.ime}</td><td>${i.telefon}</td><td>${i.vozilo}</td><td>${i.usluga}</td><td>${i.napomena||'-'}</td><td><span class="status zakazano">Zakazano</span></td></tr>`).join('')}
-function renderStats(){const z=inquiries.filter(i=>i.status==='Zakazano').length;const zv=inquiries.filter(i=>i.status==='Završeno').length;const zar=inquiries.filter(i=>i.status==='Završeno').reduce((s,i)=>s+Number(i.cena||0),0);statUpiti.textContent=inquiries.length;statZakazano.textContent=z;statZavrseno.textContent=zv;statZarada.textContent=zar+'€'}
-function exportData(){const blob=new Blob([JSON.stringify(inquiries,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='bg-auto-spa-upiti.json';a.click();URL.revokeObjectURL(url)}
-function renderAll(){renderTable();renderLatest();renderAppointments();renderStats()}
+
+function renderLatest() {
+  document.getElementById('latestTable').innerHTML = inquiries.slice(0, 5).map(i => `
+    <tr>
+      <td>${i.ime}</td>
+      <td>${i.telefon}</td>
+      <td>${i.vozilo}</td>
+      <td>${i.usluga}</td>
+      <td><span class="status ${statusClass(i.status)}">${i.status}</span></td>
+    </tr>
+  `).join('');
+}
+
+function renderAppointments() {
+  document.getElementById('appointmentsTable').innerHTML = inquiries
+    .filter(i => i.status === 'Zakazano')
+    .map(i => `
+      <tr>
+        <td>${i.ime}</td>
+        <td>${i.telefon}</td>
+        <td>${i.vozilo}</td>
+        <td>${i.usluga}</td>
+        <td>${i.napomena || '-'}</td>
+        <td><span class="status zakazano">Zakazano</span></td>
+      </tr>
+    `).join('');
+}
+
+function renderStats() {
+  const zakazano = inquiries.filter(i => i.status === 'Zakazano').length;
+  const zavrseno = inquiries.filter(i => i.status === 'Završeno').length;
+  const zarada = inquiries
+    .filter(i => i.status === 'Završeno')
+    .reduce((sum, i) => sum + Number(i.cena || 0), 0);
+
+  document.getElementById('statUpiti').textContent = inquiries.length;
+  document.getElementById('statZakazano').textContent = zakazano;
+  document.getElementById('statZavrseno').textContent = zavrseno;
+  document.getElementById('statZarada').textContent = zarada + '€';
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(inquiries, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'bg-auto-spa-upiti.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function renderAll() {
+  renderTable();
+  renderLatest();
+  renderAppointments();
+  renderStats();
+}
 
 loadInquiries();
 
 supabaseClient
   .channel('realtime-inquiries')
-  .on('postgres_changes', {event:'*', schema:'public', table:'inquiries'}, () => loadInquiries())
-  .subscribe();
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'inquiries' }, () => loadInquiries())
+  .subscribe((status) => console.log('Realtime status:', status));
 </script>
 </body>
 </html>

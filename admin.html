@@ -21,14 +21,18 @@
 <script>
 const SUPABASE_URL = 'https://appwicoxfoegjcikxbpe.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwcHdpY294Zm9lZ2pjaWt4YnBlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MTYzODQsImV4cCI6MjA5NDQ5MjM4NH0.pvf9dnFji-VZV4tCZyIVaAy_oO2IqqQCL8kGFZG08Lg';
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 let inquiries = [];
 
 function openPanel(panel, button) {
   document.querySelectorAll('.panel').forEach(i => i.classList.remove('active'));
-  document.getElementById('panel-' + panel).classList.add('active');
+  const selectedPanel = document.getElementById('panel-' + panel);
+  if (selectedPanel) selectedPanel.classList.add('active');
+
   document.querySelectorAll('.menu button').forEach(b => b.classList.remove('active'));
   if (button) button.classList.add('active');
+
   document.getElementById('panelTitle').textContent = {
     dashboard: 'Dashboard',
     upiti: 'Upiti klijenata',
@@ -38,28 +42,22 @@ function openPanel(panel, button) {
   }[panel] || 'Admin Panel';
 }
 
-function priceFromService(service) {
-  const m = String(service || '').match(/(\d+)\s*€/);
+function priceFromService(s) {
+  const m = String(s || '').match(/(\d+)€/);
   return m ? Number(m[1]) : 0;
 }
 
-function statusClass(status) {
-  return String(status || 'Novo').toLowerCase().replace('š','s').replace('ž','z');
+function statusClass(s) {
+  return String(s || 'Novo')
+    .toLowerCase()
+    .replace('š','s')
+    .replace('ž','z')
+    .replace('č','c')
+    .replace('ć','c');
 }
 
-async function loadInquiries() {
-  const { data, error } = await supabaseClient
-    .from('inquiries')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error('Greška pri učitavanju:', error);
-    alert('Greška pri učitavanju iz Supabase baze: ' + (error.message || ''));
-    return;
-  }
-
-  inquiries = (data || []).map(i => ({
+function mapDbToUi(i) {
+  return {
     id: i.id,
     date: i.created_at ? new Date(i.created_at).toLocaleDateString('sr-RS') : '-',
     ime: i.name || '',
@@ -69,37 +67,45 @@ async function loadInquiries() {
     status: i.status || 'Novo',
     cena: priceFromService(i.service || ''),
     napomena: i.message || ''
-  }));
+  };
+}
 
+async function loadInquiries() {
+  const { data, error } = await supabaseClient
+    .from('inquiries')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Greška pri učitavanju upita:', error);
+    alert('Greška pri učitavanju upita iz Supabase baze. Proveri RLS policy.');
+    return;
+  }
+
+  inquiries = (data || []).map(mapDbToUi);
   renderAll();
 }
 
 async function addInquiry(e) {
   e.preventDefault();
+
   const service = document.getElementById('usluga').value;
-  const btn = e.target.querySelector('button[type="submit"]');
-  const oldText = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = 'Čuvanje...';
-
-  const manualPrice = document.getElementById('cena').value;
-  const serviceWithPrice = manualPrice && !service.includes('€') ? `${service} - ${manualPrice}€` : service;
-
-  const { error } = await supabaseClient.from('inquiries').insert([{
-    name: document.getElementById('ime').value.trim(),
-    phone: document.getElementById('telefon').value.trim(),
-    vehicle: document.getElementById('vozilo').value.trim(),
-    service: serviceWithPrice,
-    message: document.getElementById('napomena').value.trim(),
+  const item = {
+    name: document.getElementById('ime').value,
+    phone: document.getElementById('telefon').value,
+    vehicle: document.getElementById('vozilo').value,
+    service: service,
+    message: document.getElementById('napomena').value,
     status: document.getElementById('status').value || 'Novo'
-  }]);
+  };
 
-  btn.disabled = false;
-  btn.textContent = oldText;
+  const { error } = await supabaseClient
+    .from('inquiries')
+    .insert([item]);
 
   if (error) {
-    console.error('Greška pri čuvanju:', error);
-    alert('Greška pri čuvanju upita: ' + (error.message || ''));
+    console.error('Greška pri čuvanju upita:', error);
+    alert('Greška pri čuvanju upita.');
     return;
   }
 
@@ -115,7 +121,7 @@ async function changeStatus(id, status) {
 
   if (error) {
     console.error('Greška pri promeni statusa:', error);
-    alert('Greška pri promeni statusa: ' + (error.message || ''));
+    alert('Greška pri promeni statusa.');
     return;
   }
 
@@ -131,8 +137,8 @@ async function deleteInquiry(id) {
     .eq('id', id);
 
   if (error) {
-    console.error('Greška pri brisanju:', error);
-    alert('Greška pri brisanju upita: ' + (error.message || ''));
+    console.error('Greška pri brisanju upita:', error);
+    alert('Greška pri brisanju upita.');
     return;
   }
 
@@ -140,7 +146,15 @@ async function deleteInquiry(id) {
 }
 
 function renderTable() {
-  document.getElementById('inquiryTable').innerHTML = inquiries.map(i => `
+  const table = document.getElementById('inquiryTable');
+  if (!table) return;
+
+  if (!inquiries.length) {
+    table.innerHTML = '<tr><td colspan="8">Nema upita još uvek.</td></tr>';
+    return;
+  }
+
+  table.innerHTML = inquiries.map(i => `
     <tr>
       <td>${i.date}</td>
       <td>${i.ime}</td>
@@ -162,7 +176,15 @@ function renderTable() {
 }
 
 function renderLatest() {
-  document.getElementById('latestTable').innerHTML = inquiries.slice(0, 5).map(i => `
+  const table = document.getElementById('latestTable');
+  if (!table) return;
+
+  if (!inquiries.length) {
+    table.innerHTML = '<tr><td colspan="5">Nema novih upita.</td></tr>';
+    return;
+  }
+
+  table.innerHTML = inquiries.slice(0, 5).map(i => `
     <tr>
       <td>${i.ime}</td>
       <td>${i.telefon}</td>
@@ -174,18 +196,26 @@ function renderLatest() {
 }
 
 function renderAppointments() {
-  document.getElementById('appointmentsTable').innerHTML = inquiries
-    .filter(i => i.status === 'Zakazano')
-    .map(i => `
-      <tr>
-        <td>${i.ime}</td>
-        <td>${i.telefon}</td>
-        <td>${i.vozilo}</td>
-        <td>${i.usluga}</td>
-        <td>${i.napomena || '-'}</td>
-        <td><span class="status zakazano">Zakazano</span></td>
-      </tr>
-    `).join('');
+  const table = document.getElementById('appointmentsTable');
+  if (!table) return;
+
+  const scheduled = inquiries.filter(i => i.status === 'Zakazano');
+
+  if (!scheduled.length) {
+    table.innerHTML = '<tr><td colspan="6">Nema zakazanih termina.</td></tr>';
+    return;
+  }
+
+  table.innerHTML = scheduled.map(i => `
+    <tr>
+      <td>${i.ime}</td>
+      <td>${i.telefon}</td>
+      <td>${i.vozilo}</td>
+      <td>${i.usluga}</td>
+      <td>${i.napomena || '-'}</td>
+      <td><span class="status zakazano">Zakazano</span></td>
+    </tr>
+  `).join('');
 }
 
 function renderStats() {
@@ -193,7 +223,7 @@ function renderStats() {
   const zavrseno = inquiries.filter(i => i.status === 'Završeno').length;
   const zarada = inquiries
     .filter(i => i.status === 'Završeno')
-    .reduce((sum, i) => sum + Number(i.cena || 0), 0);
+    .reduce((s, i) => s + Number(i.cena || 0), 0);
 
   document.getElementById('statUpiti').textContent = inquiries.length;
   document.getElementById('statZakazano').textContent = zakazano;
@@ -218,12 +248,16 @@ function renderAll() {
   renderStats();
 }
 
-loadInquiries();
-
 supabaseClient
-  .channel('realtime-inquiries')
-  .on('postgres_changes', { event: '*', schema: 'public', table: 'inquiries' }, () => loadInquiries())
-  .subscribe((status) => console.log('Realtime status:', status));
+  .channel('admin-live-inquiries')
+  .on(
+    'postgres_changes',
+    { event: '*', schema: 'public', table: 'inquiries' },
+    () => loadInquiries()
+  )
+  .subscribe();
+
+loadInquiries();
 </script>
 </body>
 </html>

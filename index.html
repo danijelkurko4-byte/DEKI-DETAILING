@@ -738,11 +738,11 @@
   <header>
     <div class="logo" onclick="showPage('pocetna')">
       <div class="logo-icon">
-        <img src="logo.png" alt="BG Auto Spa Logo" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;" />
+        <img id="siteLogoImg" src="logo.png" alt="BG Auto Spa Logo" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;" />
       </div>
       <div class="logo-text">
-        <span>BG AUTO SPA</span>
-        <span>DETAILING STUDIO</span>
+        <span id="siteNameText">BG AUTO SPA</span>
+        <span id="siteSubtitleText">DETAILING STUDIO</span>
       </div>
     </div>
     <nav>
@@ -758,10 +758,10 @@
     <section class="page active" id="page-pocetna">
       <div class="hero">
         <div class="hero-content">
-          <h1>Tvoj auto, <span>naš ponos!</span></h1>
-          <p>BG Auto Spa je detailing studio iz Mirijeva u Beogradu. Radimo dubinsko pranje, poliranje, keramičku zaštitu i lakiranje kočnica — uz pažljiv pristup svakom vozilu i rezultat koji se odmah vidi.</p>
+          <h1 id="heroTitle">Tvoj auto, <span>naš ponos!</span></h1>
+          <p id="heroText">BG Auto Spa je detailing studio iz Mirijeva u Beogradu. Radimo dubinsko pranje, poliranje, keramičku zaštitu i lakiranje kočnica — uz pažljiv pristup svakom vozilu i rezultat koji se odmah vidi.</p>
           <div class="btns">
-            <a class="btn btn-primary" href="https://www.instagram.com/bg.auto.spa/" target="_blank">Zakaži preko Instagrama</a>
+            <a id="mainInstagramBtn" class="btn btn-primary" href="https://www.instagram.com/bg.auto.spa/" target="_blank">Zakaži preko Instagrama</a>
             <button class="btn btn-secondary" onclick="showPage('usluge')">Pogledaj usluge</button>
           </div>
         </div>
@@ -796,9 +796,8 @@
         <div class="about">
           <img src="https://images.unsplash.com/photo-1605515298946-d062f2e9da53?auto=format&fit=crop&w=1200&q=80" alt="Detailing vozila" />
           <div class="about-text">
-            <h2>BG Auto Spa — Mirijevo, Beograd</h2>
-            <p>Naš cilj je jednostavan: da svaki auto izađe čistiji, sjajniji i uredniji nego što je došao. Zato radimo detaljno, pažljivo i bez žurbe.</p>
-            <p>Bilo da vam treba dubinsko pranje enterijera, poliranje laka, keramička zaštita ili lakiranje kočnica, BG Auto Spa je mesto gde vaš auto dobija tretman kakav zaslužuje.</p>
+            <h2 id="aboutTitle">BG Auto Spa — Mirijevo, Beograd</h2>
+            <div id="aboutText"><p>Naš cilj je jednostavan: da svaki auto izađe čistiji, sjajniji i uredniji nego što je došao. Zato radimo detaljno, pažljivo i bez žurbe.</p><p>Bilo da vam treba dubinsko pranje enterijera, poliranje laka, keramička zaštita ili lakiranje kočnica, BG Auto Spa je mesto gde vaš auto dobija tretman kakav zaslužuje.</p></div>
           </div>
         </div>
       </div>
@@ -1010,10 +1009,10 @@
   </main>
 
   <footer>
-    <p>© 2026 BG Auto Spa. Mirijevo, Beograd. Instagram: @bg.auto.spa</p>
+    <p id="footerText">© 2026 BG Auto Spa. Mirijevo, Beograd. Instagram: @bg.auto.spa</p>
   </footer>
 
-  <a class="floating-instagram" href="https://www.instagram.com/bg.auto.spa/" target="_blank" aria-label="Instagram">◎</a>
+  <a id="floatingInstagram" class="floating-instagram" href="https://www.instagram.com/bg.auto.spa/" target="_blank" aria-label="Instagram">◎</a>
 
   <script>
     function createBubbleTransition() {
@@ -1131,6 +1130,60 @@
       `;
     }
 
+
+    async function loadLiveSettings() {
+      const { data, error } = await supabaseClient
+        .from('site_settings')
+        .select('*')
+        .order('id', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+
+      if (error || !data) {
+        if (error) console.error('Greška pri učitavanju podešavanja:', error);
+        return;
+      }
+
+      const siteName = data.site_name || 'BG Auto Spa';
+      const subtitle = data.subtitle || 'DETAILING STUDIO';
+      const slogan = data.slogan || 'Tvoj auto, naš ponos!';
+      const location = data.location || 'Mirijevo, Beograd';
+      const instagram = data.instagram || 'https://www.instagram.com/bg.auto.spa/';
+      const logoUrl = data.logo_url || 'logo.png';
+      const heroTextValue = data.hero_text || '';
+      const aboutTextValue = data.about_text || '';
+
+      document.title = siteName + ' | Detailing i poliranje vozila';
+      const siteNameText = document.getElementById('siteNameText');
+      const siteSubtitleText = document.getElementById('siteSubtitleText');
+      const siteLogoImg = document.getElementById('siteLogoImg');
+      const heroTitle = document.getElementById('heroTitle');
+      const heroText = document.getElementById('heroText');
+      const aboutTitle = document.getElementById('aboutTitle');
+      const aboutText = document.getElementById('aboutText');
+      const footerText = document.getElementById('footerText');
+      const mainInstagramBtn = document.getElementById('mainInstagramBtn');
+      const floatingInstagram = document.getElementById('floatingInstagram');
+
+      if (siteNameText) siteNameText.textContent = siteName.toUpperCase();
+      if (siteSubtitleText) siteSubtitleText.textContent = subtitle;
+      if (siteLogoImg) siteLogoImg.src = logoUrl;
+      if (heroTitle) heroTitle.innerHTML = escapeHtml(slogan).replace(',', ', <span>') + (slogan.includes(',') ? '</span>' : '');
+      if (heroText && heroTextValue) heroText.textContent = heroTextValue;
+      if (aboutTitle) aboutTitle.textContent = siteName + ' — ' + location;
+      if (aboutText && aboutTextValue) aboutText.innerHTML = aboutTextValue.split('\n').filter(Boolean).map(p => `<p>${escapeHtml(p)}</p>`).join('');
+      if (footerText) footerText.textContent = '© 2026 ' + siteName + '. ' + location + '. Instagram: @bg.auto.spa';
+      if (mainInstagramBtn) mainInstagramBtn.href = instagram;
+      if (floatingInstagram) floatingInstagram.href = instagram;
+
+      if (data.hero_image) {
+        const hero = document.querySelector('.hero');
+        if (hero) {
+          hero.style.background = `linear-gradient(rgba(0,0,0,0.62), rgba(0,0,0,0.78)), url('${data.hero_image}') center/cover no-repeat`;
+        }
+      }
+    }
+
     async function loadLiveServices() {
       const { data, error } = await supabaseClient
         .from('services')
@@ -1227,12 +1280,14 @@
 
     function startLiveUpdates() {
       supabaseClient
-        .channel('site-live-services-gallery')
+        .channel('site-live-services-gallery-settings')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'services' }, loadLiveServices)
         .on('postgres_changes', { event: '*', schema: 'public', table: 'gallery' }, loadLiveGallery)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'site_settings' }, loadLiveSettings)
         .subscribe();
     }
 
+    loadLiveSettings();
     loadLiveServices();
     loadLiveGallery();
     startLiveUpdates();

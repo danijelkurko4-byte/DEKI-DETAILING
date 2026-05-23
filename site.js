@@ -126,7 +126,9 @@
 
   function buildReviewsHtml() {
     let list = [];
-    if (typeof getPublishedReviews === 'function') {
+    if (window.__publishedReviews && window.__publishedReviews.length) {
+      list = window.__publishedReviews;
+    } else if (typeof getPublishedReviews === 'function') {
       list = getPublishedReviews();
     } else if (typeof SITE !== 'undefined' && SITE.reviews) {
       list = SITE.reviews;
@@ -159,26 +161,65 @@
       .join('');
   }
 
-  window.submitReview = function (e) {
+  async function loadSupabasePublicData() {
+    if (typeof isSupabaseConfigured !== 'function' || !isSupabaseConfigured()) return;
+    if (typeof BgSupabase === 'undefined') return;
+
+    try {
+      const remote = await BgSupabase.fetchSiteSettings();
+      if (remote && Object.keys(remote).length) {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(remote));
+      }
+      let approved = await BgSupabase.fetchReviewsByStatus('approved');
+      if ((!approved || !approved.length) && typeof SITE !== 'undefined' && SITE.reviews) {
+        await BgSupabase.seedReviewsIfEmpty(SITE.reviews);
+        approved = await BgSupabase.fetchReviewsByStatus('approved');
+      }
+      window.__publishedReviews = approved || [];
+      renderReviews();
+    } catch (err) {
+      console.warn('Supabase public load:', err);
+    }
+  }
+
+  window.submitReview = async function (e) {
     e.preventDefault();
     const success = el('review-form-success');
     const err = el('review-form-error');
 
-    if (typeof submitClientReview !== 'function') {
-      if (err) {
-        err.hidden = false;
-        err.textContent = 'Sistem recenzija nije učitan. Proveri config.js.';
-      }
-      return;
-    }
-
-    const result = submitClientReview({
+    const payload = {
       name: el('rev-name').value,
       vozilo: el('rev-vozilo').value,
       usluga: el('rev-usluga').value,
       stars: el('rev-stars').value,
       text: el('rev-text').value,
-    });
+    };
+
+    let result = { ok: false, error: 'Sistem recenzija nije učitan.' };
+
+    if (typeof isSupabaseConfigured === 'function' && isSupabaseConfigured() && typeof BgSupabase !== 'undefined') {
+      const name = String(payload.name || '').trim();
+      const text = String(payload.text || '').trim();
+      if (!name) result = { ok: false, error: 'Unesite ime (može inicijali, npr. Marko P.).' };
+      else if (text.length < 10) result = { ok: false, error: 'Komentar mora imati najmanje 10 karaktera.' };
+      else {
+        result = await BgSupabase.insertPendingReview({
+          id: Date.now(),
+          date: new Date().toLocaleDateString('sr-RS'),
+          name: name,
+          vozilo: String(payload.vozilo || '').trim(),
+          usluga: String(payload.usluga || '').trim(),
+          text: text,
+          stars: Math.min(5, Math.max(1, Number(payload.stars) || 5)),
+        });
+      }
+    } else if (typeof submitClientReview === 'function') {
+      result = submitClientReview(payload);
+    } else if (err) {
+      err.hidden = false;
+      err.textContent = 'Sistem recenzija nije učitan. Proveri config.js.';
+      return;
+    }
 
     if (!result.ok) {
       if (err) {
@@ -434,7 +475,7 @@
     });
   }
 
-  window.sendRequest = function (e) {
+  window.sendRequest = async function (e) {
     e.preventDefault();
     const c = cfg();
     const ime = el('ime').value.trim();
@@ -469,12 +510,17 @@
       napomena: poruka,
     };
 
-    try {
-      const list = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      list.unshift(item);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-    } catch (err) {
-      console.warn('localStorage', err);
+    if (typeof isSupabaseConfigured === 'function' && isSupabaseConfigured() && typeof BgSupabase !== 'undefined') {
+      const res = await BgSupabase.insertInquiry(item);
+      if (!res.ok) console.warn('Supabase upit:', res.error);
+    } else {
+      try {
+        const list = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        list.unshift(item);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      } catch (err) {
+        console.warn('localStorage', err);
+      }
     }
 
     const success = el('form-success');
@@ -504,6 +550,7 @@
       expandServiceSelect();
       initStarPicker();
       initLightbox();
+      loadSupabasePublicData();
     } catch (err) {
       console.error('BG Auto Spa init:', err);
       renderReviews();

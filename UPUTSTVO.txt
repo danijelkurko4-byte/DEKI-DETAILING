@@ -3,8 +3,10 @@ BG AUTO SPA — SAJT (ažurirano)
 Fajlovi:
   index.html    = glavni sajt
   admin.html    = admin panel (upiti)
-  config.js     = TELEFON, WhatsApp, adresa, recenzije (glavno mesto za izmenu)
-  site.js       = logika (galerija, forma, WhatsApp, SEO šema)
+  config.js            = TELEFON, WhatsApp, adresa, recenzije
+  supabase-config.js   = Supabase URL + anon key
+  supabase-schema.sql  = SQL za bazu (jednom u Supabase)
+  site.js / admin.js   = logika (ne diraj osim ako znaš šta radiš)
   favicon.svg   = ikonica u tabu
   logo.png      = logo
   gallery/      = tvoje slike (hero.jpg, about.jpg, 1.jpg–6.jpg)
@@ -19,9 +21,14 @@ VAŽNO — pre deploya na Render:
 Kako se otvara lokalno:
   - Dupli klik na index.html ili Live Server u VS Code/Cursor
 
-Admin panel:
-  - admin.html — upiti iz forme se čuvaju u localStorage (isti browser)
-  - Podešavanja u adminu prepisuju config.js vrednosti u browseru
+Admin panel + Supabase:
+  1. Otvori supabase.com → novi projekat (ili postojeći)
+  2. SQL Editor → nalepi ceo fajl supabase-schema.sql → Run
+  3. Project Settings → API → kopiraj URL i anon public key u supabase-config.js
+  4. Authentication → Users → Add user (email + lozinka za admin)
+  5. Otvori admin.html → uloguj se tim nalogom
+  - Upiti sa sajta idu u Supabase (vidiš ih sa telefona i laptopa)
+  - Bez supabase-config.js radi samo localStorage (isti browser)
 
 Forma na sajtu:
   - Čuva upit u admin panel
@@ -37,6 +44,8 @@ Hosting (Render):
   - Uploaduj ceo folder "detajling deki"
   - Za svoj domen: poveži DNS na Render i promeni siteUrl u config.js
 
-Napomena:
-  Za upite sa svih telefona/računara treba online baza (npr. Supabase).
-  Trenutno localStorage radi samo na istom uređaju/browseru.
+Fajlovi za Supabase:
+  supabase-config.js   = URL + anon key (obavezno za online)
+  supabase-schema.sql  = tabele u bazi (pokreni jednom)
+  supabase-db.js       = ne diraj
+  admin.js             = ne diraj

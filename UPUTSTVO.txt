@@ -1,0 +1,42 @@
+BG AUTO SPA — SAJT (ažurirano)
+
+Fajlovi:
+  index.html    = glavni sajt
+  admin.html    = admin panel (upiti)
+  config.js     = TELEFON, WhatsApp, adresa, recenzije (glavno mesto za izmenu)
+  site.js       = logika (galerija, forma, WhatsApp, SEO šema)
+  favicon.svg   = ikonica u tabu
+  logo.png      = logo
+  gallery/      = tvoje slike (hero.jpg, about.jpg, 1.jpg–6.jpg)
+
+VAŽNO — pre deploya na Render:
+  1. Otvori config.js
+  2. Zameni phone i whatsapp pravim brojevima
+  3. Zameni addressDetail tačnom adresom
+  4. Dodaj slike u gallery/ (vidi gallery/README.txt)
+  5. Po želji izmeni recenzije u config.js (reviews)
+
+Kako se otvara lokalno:
+  - Dupli klik na index.html ili Live Server u VS Code/Cursor
+
+Admin panel:
+  - admin.html — upiti iz forme se čuvaju u localStorage (isti browser)
+  - Podešavanja u adminu prepisuju config.js vrednosti u browseru
+
+Forma na sajtu:
+  - Čuva upit u admin panel
+  - Otvara WhatsApp sa popunjenom porukom
+
+Recenzije:
+  - Klijent: meni Recenzije → forma "Ostavi recenziju"
+  - Admin: admin.html → Recenzije → Odobri / Odbij
+  - Na sajtu se vide samo ODOBRENE recenzije
+  - Prve recenzije iz config.js su učitane jednom kao objavljene
+
+Hosting (Render):
+  - Uploaduj ceo folder "detajling deki"
+  - Za svoj domen: poveži DNS na Render i promeni siteUrl u config.js
+
+Napomena:
+  Za upite sa svih telefona/računara treba online baza (npr. Supabase).
+  Trenutno localStorage radi samo na istom uređaju/browseru.
